@@ -1,0 +1,31 @@
+airport:
+  code: WAW
+  name: Warsaw Chopin (toy model)
+
+time:
+  timezone: Europe/Warsaw
+  time_resolution_minutes: 1
+
+turnaround:
+  buffer_minutes: 10
+  default_turnaround_minutes:
+    S: 45
+    M: 55
+    L: 75
+
+gates:
+  - gate_id: G1
+    compatible_classes: [S, M]
+    walk_cost: 1.0
+  - gate_id: G2
+    compatible_classes: [S, M]
+    walk_cost: 1.1
+  - gate_id: G3
+    compatible_classes: [S, M]
+    walk_cost: 1.2
+  - gate_id: G4
+    compatible_classes: [S, M, L]
+    walk_cost: 1.4
+  - gate_id: G5
+    compatible_classes: [S, M, L]
+    walk_cost: 1.6
