@@ -1,31 +1,97 @@
+benchmark:
+  name: "Airport Gate Benchmark"
+  schema_version: "1.0"
+  config_version: "1.0"
+  created_by: "Amirmohammad Qanbari, WUT"
+  notes:
+    - "Reduced-scale airport model for reproducible benchmarking."
+    - "Values are abstractions designed for controlled comparisons, not an exact replica of WAW infrastructure."
+
 airport:
-  code: WAW
-  name: Warsaw Chopin (toy model)
+  code: "WAW"
+  name: "Warsaw Chopin (Benchmark Model)"
+  model_type: "reduced_scale"
+  num_gates: 6
 
 time:
-  timezone: Europe/Warsaw
-  time_resolution_minutes: 1
+  timezone: "Europe/Warsaw"
+  resolution_minutes: 1
+  datetime_format: "ISO-8601"
+
+units:
+  time: "minutes"
+  distance_proxy: "normalized"   # not meters; ensures portability
 
 turnaround:
-  buffer_minutes: 10
+  buffer_minutes: 10              # safety / operational slack added to occupancy
   default_turnaround_minutes:
     S: 45
     M: 55
     L: 75
 
+aircraft_classes:
+  S:
+    description: "Small / regional / narrow-body light"
+  M:
+    description: "Narrow-body standard"
+  L:
+    description: "Wide-body / heavy"
+
 gates:
-  - gate_id: G1
-    compatible_classes: [S, M]
-    walk_cost: 1.0
-  - gate_id: G2
-    compatible_classes: [S, M]
-    walk_cost: 1.1
-  - gate_id: G3
-    compatible_classes: [S, M]
-    walk_cost: 1.2
-  - gate_id: G4
-    compatible_classes: [S, M, L]
-    walk_cost: 1.4
-  - gate_id: G5
-    compatible_classes: [S, M, L]
-    walk_cost: 1.6
+  # Fields:
+  # - walk_cost: normalized passenger walking proxy (lower = closer/better)
+  # - zone: coarse terminal zone label (for analysis + passenger impact)
+  # - has_bridge: whether contact stand / jet bridge exists
+  # - remote_stand: if true, implies bus transfer penalty (can be modeled later)
+
+  - gate_id: "G1"
+    compatible_classes: ["S", "M"]
+    zone: "A"
+    walk_cost: 1.00
+    has_bridge: true
+    remote_stand: false
+
+  - gate_id: "G2"
+    compatible_classes: ["S", "M"]
+    zone: "A"
+    walk_cost: 1.10
+    has_bridge: true
+    remote_stand: false
+
+  - gate_id: "G3"
+    compatible_classes: ["S", "M", "L"]
+    zone: "B"
+    walk_cost: 1.25
+    has_bridge: true
+    remote_stand: false
+
+  - gate_id: "G4"
+    compatible_classes: ["S", "M", "L"]
+    zone: "B"
+    walk_cost: 1.35
+    has_bridge: true
+    remote_stand: false
+
+  - gate_id: "G5"
+    compatible_classes: ["S", "M"]
+    zone: "C"
+    walk_cost: 1.55
+    has_bridge: false
+    remote_stand: true
+
+  - gate_id: "G6"
+    compatible_classes: ["S", "M"]
+    zone: "C"
+    walk_cost: 1.70
+    has_bridge: false
+    remote_stand: true
+
+assumptions:
+  - "One flight occupies exactly one gate for the interval [arr_actual, dep_actual + buffer]."
+  - "Gate compatibility is modeled via aircraft size classes only (S/M/L)."
+  - "walk_cost is a normalized proxy used for passenger-weighted KPIs; not a physical distance."
+  - "Remote stands are represented via walk_cost/penalty and can be extended with explicit bus-transfer penalties."
+
+export:
+  # Helpful for later papers / tooling:
+  recommended_id: "WAW-RS-6G-v1"   # citeable model identifier
